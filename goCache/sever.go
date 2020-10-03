@@ -41,7 +41,7 @@ func (p *HTTPPool) Log(format string, v ...interface{}) {
 // SeverHTTP Http Handler for http requests
 func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.URL.Path, p.basePath) {
-		panic("HTTPool sever unexpected path: " + r.URL.Path)
+		panic("HTTPPool sever unexpected path: " + r.URL.Path)
 	}
 
 	p.Log("%s %s", r.Method, r.URL.Path)
@@ -54,6 +54,8 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	groupName := parts[0]
 	key := parts[1]
+
+	log.Println(groupName + " _ " + key)
 
 	group := GetGroup(groupName)
 	if group == nil {
@@ -103,7 +105,7 @@ type httpGetter struct {
 
 // Get 向远程节点发送请求.
 func (h *httpGetter) Get(group string, key string) ([]byte, error) {
-	u := fmt.Sprintf("%v%v/%v ", h.baseURL, url.QueryEscape(group), url.QueryEscape(key))
+	u := fmt.Sprintf("%v%v/%v", h.baseURL, url.QueryEscape(group), url.QueryEscape(key))
 	res, err := http.Get(u)
 
 	if err != nil {
@@ -120,7 +122,6 @@ func (h *httpGetter) Get(group string, key string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading response body %v", err)
 	}
-
 	return bytes, nil
 }
 

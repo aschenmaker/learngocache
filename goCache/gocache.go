@@ -76,6 +76,7 @@ func (g *Group) Get(key string) (ByteView, error) {
 }
 
 func (g *Group) load(key string) (value ByteView, err error) {
+	// 保证了请求其他节点只会有一次
 	viewOnce, err := g.loader.Do(key, func() (interface{}, error) {
 		if g.peers != nil {
 			if peer, ok := g.peers.PickPeer(key); ok {
@@ -85,12 +86,13 @@ func (g *Group) load(key string) (value ByteView, err error) {
 				log.Println("[goCache] Failed to get from peer", err)
 			}
 		}
+
 		return g.getLocally(key)
 	})
+
 	if err == nil {
 		return viewOnce.(ByteView), nil
 	}
-
 	return
 }
 
